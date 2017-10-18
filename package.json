@@ -4,8 +4,8 @@
   "description": "a easy blog",
   "main": "index.js",
   "scripts": {
-    "start": "NODE_ENV=production pm2 start index.js --node-args='--harmony' --name 'myblog'",
-    "pro":"cross-env NODE_ENV=production supervisor --harmony index",
+    "start": "cross-env NODE_ENV=production pm2 start index.js --node-args='--harmony' --name 'nodeblog'",
+    "pro": "cross-env NODE_ENV=production supervisor --harmony index",
     "heroku": "NODE_ENV=production node --harmony index",
     "test": "node --harmony ./node_modules/istanbul/lib/cli.js cover ./node_modules/mocha/bin/_mocha"
   },

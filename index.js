@@ -103,6 +103,8 @@ if (module.parent) {
 	//如果index被require，则导出require
 	module.exports = app;
 } else {
+	const port = process.env.PORT || config.port;
+	console.log(config.mongodb)
 	app.listen(config.port, function(){
 		console.log(`${pkg.name} listening on port ${config.port}`);
 	})
