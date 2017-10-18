@@ -6,7 +6,10 @@ var flash = require('connect-flash');
 var config = require('config-lite')(__dirname);
 var routes = require('./routes');
 var pkg = require('./package');
+var winston = require('winston');
+var expressWinston = require('express-winston');
 var formidable = require('express-formidable');
+
 
 var app = express();
 
@@ -55,15 +58,52 @@ app.locals.blog = {
 app.use(function(req,res,next){
 	res.locals.user = req.session.user;
 	res.locals.success = req.flash('success').toString();
-	console.log('res.locals.success',res.locals.success)
 	res.locals.error = req.flash('error').toString();
 	next();
 });
 
+//请求日志
+app.use(expressWinston.logger({
+	transports: [
+		new (winston.transports.Console)({
+			json: true,
+			colorize: true
+		}),
+		new winston.transports.File({
+			filename: 'logs/success.log'
+		})
+	]
+}))
+
 //路由
 routes(app);
 
-//监听端口
-app.listen(config.port,function(){
-	console.log(`${pkg.name} listening on port ${config.port}`);
+//错误日志
+app.use(expressWinston.errorLogger({
+	transports: [
+		new winston.transports.Console({
+			json: true,
+			colorize: true
+		}),
+		new winston.transports.File({
+			filename: 'logs/error.log'
+		})
+	]
+}))
+
+//处理错误
+app.use(function(err,req,res,next){
+	res.render('error',{
+		error: err
+	})
 })
+
+//监听端口
+if (module.parent) {
+	//如果index被require，则导出require
+	module.exports = app;
+} else {
+	app.listen(config.port, function(){
+		console.log(`${pkg.name} listening on port ${config.port}`);
+	})
+}
